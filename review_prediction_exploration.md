@@ -125,7 +125,7 @@ operational decision-making.
 ### Key Insights
 
 - **Delivery performance is a primary driver of customer satisfaction**.  
-  Features related to delivery timing, particularly early delivery relative to expectations—were among the most influential predictors of 5-star reviews.
+  Features related to delivery timing, particularly early delivery relative to expectations were among the most influential predictors of 5-star reviews.
 
 - **Customer expectations matter as much as speed**.  
   Orders delivered earlier than the estimated delivery date showed a higher likelihood of receiving positive reviews, highlighting the importance of expectation management.
