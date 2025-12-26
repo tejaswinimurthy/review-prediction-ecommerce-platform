@@ -1,0 +1,157 @@
+# Review Prediction for Targeted Customer Incentives
+
+## 1. Business Context
+Positive customer reviews play a critical role in online retail, influencing customer trust, product visibility, and conversion rates. However, incentivising every customer to leave a review is costly and inefficient. The business challenge is therefore to identify customers who are most likely to leave a positive (5-star) review so that incentives can be targeted effectively.
+
+This project frames the problem as a decision-support task: using historical order, delivery, and customer data to support more efficient marketing and incentive strategies.
+
+## 2. Data Overview
+The analysis is based on a relational eCommerce dataset consisting of multiple tables capturing different aspects of the customer journey.
+
+For this project, the following tables were used:
+- Orders
+- Order items
+- Customers
+- Reviews
+- Products
+- Sellers
+
+The unit of analysis was defined at the **order level**, as reviews are associated with individual orders rather than directly with customers. The orders table was used as the core table, with additional information joined to enrich each order with customer attributes, product characteristics, seller information, and review outcomes.
+
+## 3. Data Preparation & Feature Engineering
+The raw transactional data was transformed into order-level features designed to capture customer experience, perceived value, and service quality.
+
+Feature engineering focused on variables that are both predictive and interpretable from a business perspective. Below are three representative features used in the modelling stage.
+
+```python
+import pandas as pd
+
+# Assumes an order-level dataframe called `orders_df`
+# Data loading is omitted in this portfolio version
+```
+### Feature 1: Delivery Time
+- Delivery time measures the number of days between order purchase and customer delivery.
+- This feature captures service efficiency and reliability. 
+- Longer delivery times are hypothesised to reduce customer satisfaction, while faster deliveries are more likely to result in positive reviews.
+
+```python
+orders_df["order_purchase_ts"] = pd.to_datetime(orders_df["order_purchase_timestamp"])
+orders_df["order_delivered_ts"] = pd.to_datetime(orders_df["order_delivered_customer_date"])
+
+orders_df["delivery_time_days"] = (
+    orders_df["order_delivered_ts"] - orders_df["order_purchase_ts"]
+).dt.days
+
+orders_df[["order_id", "delivery_time_days"]].head()
+```
+### Feature 2: Time Gain
+- Time gain measures the difference between the estimated delivery date and the actual delivery date.
+- A positive time gain indicates that an order was delivered earlier than expected.
+- This feature captures whether the platform exceeded customer expectations, which is strongly linked to higher review scores.
+
+```python
+orders_df["order_estimated_ts"] = pd.to_datetime(orders_df["order_estimated_delivery_date"])
+
+orders_df["time_gain_days"] = (
+    orders_df["order_estimated_ts"] - orders_df["order_delivered_ts"]
+).dt.days
+
+orders_df[["order_id", "time_gain_days"]].head()
+```
+### Feature 3: Total Order Value
+- Total order value is calculated as the sum of item prices and delivery fees for each order.
+- This feature reflects the overall economic value of the transaction. Higher-value orders may lead to different customer expectations and satisfaction dynamics
+compared to low-value purchases.
+
+```python
+order_value = (
+    orders_df.groupby("order_id", as_index=False)
+    .agg(
+        total_price=("price", "sum"),
+        total_delivery=("freight_value", "sum")
+    )
+)
+
+order_value["total_order_value"] = (
+    order_value["total_price"] + order_value["total_delivery"]
+)
+
+order_value[["order_id", "total_order_value"]].head()
+```
+## 4. Modelling Approach
+The prediction task was framed as a **binary classification problem**, where the objective was to identify whether an order would result in a 5-star review or not. This framing aligns with the business goal of targeting incentives only toward customers most likely to leave highly positive reviews, rather than predicting exact rating values.
+Several tree-based ensemble models were explored, including Random Forest, Gradient Boosted Decision Trees (GBDT), and Extreme Gradient Boosting (XGBoost). These models were selected due to their ability to capture non-linear relationships and complex interactions between delivery performance, order characteristics, and customer location.
+Among the evaluated models, **Gradient Boosted Decision Trees (GBDT)** provided the most appropriate balance between predictive performance and business interpretability, making it the preferred choice for this use case.
+
+
+## 5. Evaluation Strategy
+
+The model evaluation was designed to reflect the **business objective** rather than optimising purely for predictive accuracy.
+In this context, the goal is to identify customers who are likely to leave 5-star reviews so that incentives can be targeted efficiently. Incorrectly predicting that a customer will leave a positive review (false positives) results in unnecessary incentive costs, making evaluation trade-offs critical.
+
+### Evaluation Metrics
+The following metrics were prioritised:
+
+- **Precision**: Measures how many predicted 5-star reviews were actually 5-star. High precision reduces wasted incentives.
+- **Recall**: Measures how many true 5-star reviews were correctly identified. Higher recall increases coverage of potential positive reviewers.
+- **F1-score**: Balances precision and recall to assess overall effectiveness.
+
+Rather than maximising a single metric, model selection focused on achieving a balanced trade-off aligned with cost efficiency and business impact.
+
+### Model Comparison Summary
+Multiple ensemble models were evaluated, including Random Forest, Gradient Boosted Decision Trees (GBDT), and Extreme Gradient Boosting (XGBoost).
+While some models achieved higher precision, they also produced a larger number of false positives. **GBDT** demonstrated a more favourable balance between precision, recall, and false positive rates, making it better suited for targeted incentive strategies.
+
+### Confusion Matrix Interpretation
+The confusion matrix was used to directly assess the business implications of model errors:
+- **True positives** represent correctly identified customers suitable for incentives.
+- **False positives** represent unnecessary incentive allocation.
+- **False negatives** represent missed opportunities for positive reviews.
+Reducing false positives was prioritised, as these directly translate into avoidable marketing costs.
+
+```python
+from sklearn.metrics import ConfusionMatrixDisplay
+
+# Example: visualising model performance on the test set
+ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
+```
+
+## 6. Business Insights & Recommendations
+
+The modelling results provide several actionable insights into the drivers of
+positive customer reviews and how these insights can be translated into
+operational decision-making.
+
+### Key Insights
+
+- **Delivery performance is a primary driver of customer satisfaction**.  
+  Features related to delivery timing—particularly early delivery relative to expectations—were among the most influential predictors of 5-star reviews.
+
+- **Customer expectations matter as much as speed**.  
+  Orders delivered earlier than the estimated delivery date showed a higher likelihood of receiving positive reviews, highlighting the importance of expectation management.
+
+- **Order value influences review behaviour**.  
+  Higher-value orders exhibited different satisfaction dynamics, suggesting that customers may evaluate their experience more carefully when spending more.
+
+### Business Recommendations
+
+Based on these insights, the following recommendations are proposed:
+- **Optimise logistics and delivery reliability**  
+  Investments aimed at reducing delivery time and improving delivery predictability are likely to yield improvements in customer satisfaction and review quality.
+
+- **Target incentives selectively**  
+  Use the predictive model to identify customers with a high likelihood of leaving 5-star reviews, and focus incentives on this group to maximise return on marketing spend.
+
+- **Align incentives with customer value**  
+  Tailor incentive strategies based on order value and delivery experience, rather than applying uniform campaigns across all customers.
+
+
+### Deployment Considerations
+
+For practical deployment, the model could be integrated into the order fulfilment or post-delivery workflow, generating incentive recommendations once an order is completed. Periodic retraining and monitoring would be required to ensure model performance remains aligned with evolving customer behaviour and operational conditions.
+
+### Final Remarks
+
+Overall, this project demonstrates how predictive analytics can support cost-effective decision-making by aligning model outputs with real business objectives. Rather than optimising for accuracy alone, the approach prioritises actionable insights that improve customer experience while controlling operational costs.
+
+
