@@ -107,6 +107,9 @@ The confusion matrix was used to directly assess the business implications of mo
 - **True positives** represent correctly identified customers suitable for incentives.
 - **False positives** represent unnecessary incentive allocation.
 - **False negatives** represent missed opportunities for positive reviews.
+
+![Confusion Matrix showing model performance](./assets/confusion_matrix.png)
+
 Reducing false positives was prioritised, as these directly translate into avoidable marketing costs.
 
 ```python
