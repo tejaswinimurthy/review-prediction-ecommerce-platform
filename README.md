@@ -1,4 +1,5 @@
 # Review Prediction for Targeted Customer Incentives
+📄 Full case study: [Review Prediction for Targeted Customer Incentives](./review_prediction_exploration.md)
 
 ## Context
 This project is based on an academic consulting-style assignment completed as part of the *MSc Business Analytics* programme at Warwick Business School.
