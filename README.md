@@ -1,27 +1,43 @@
 # Review Prediction for Targeted Customer Incentives
-📄 Full case study: [Review Prediction for Targeted Customer Incentives](./review_prediction_exploration.md)
+
+📄 **Full case study:**  
+[Review Prediction for Targeted Customer Incentives](./review_prediction_exploration.md)
+
+---
 
 ## Context
-This project is based on an academic consulting-style assignment completed as part of the *MSc Business Analytics* programme at Warwick Business School.
+This project is based on an academic, consulting-style assignment completed as part of the MSc Business Analytics programme at Warwick Business School.
 
-The task was framed as a real-world business pitch for a large eCommerce platform, with the goal of predicting which customers are most likely to leave positive reviews so that incentives can be targeted efficiently.
+The task was framed as a real-world business pitch for a large eCommerce platform, with the objective of developing a predictive model to identify customers most likely to leave positive reviews, enabling more efficient and targeted incentive strategies.
+
+---
 
 ## Business Problem
-Online platforms rely heavily on positive customer reviews, but incentivising every customer is costly and inefficient.
+Online retail platforms rely heavily on positive customer reviews, but incentivising every customer is costly and inefficient.
 
 The objective was to:
 - Predict which customers are most likely to leave positive reviews
 - Enable targeted incentives rather than blanket campaigns
-- Evaluate models based on business usefulness, not just accuracy
+- Select a predictive model based on **business usefulness**, not raw accuracy alone
+
+---
 
 ## Approach (High Level)
-- Joined and prepared multiple relational datasets representing orders, customers, products, and reviews
-- Engineered behavioural and transactional features
-- Trained and evaluated classification models to predict review sentiment
-- Focused evaluation on precision, recall, and business trade-offs rather than raw accuracy
+- Joined and prepared multiple relational datasets representing orders, customers, products, sellers, and reviews
+- Engineered behavioural and transactional features at the order level
+- Trained and evaluated multiple classification models
+- Focused evaluation on precision, recall, and the cost of incorrect targeting
 
-## Outcome
-The analysis demonstrated that predictive models can meaningfully support targeted review-incentive strategies, improving efficiency while maintaining review quality.
+---
+
+## Model Selection & Outcome
+Multiple classification models were evaluated, including logistic regression, random forest, and **gradient boosted decision trees (GBDT)**.
+
+**GBDT delivered the strongest overall performance** and was selected as the final model, particularly due to its favourable precision–recall trade-off aligned with the business objective of targeted incentives.
+
+The analysis demonstrated that predictive modelling can meaningfully support more efficient review-incentive strategies while maintaining review quality.
+
+---
 
 ## Tech Stack
 - Python
@@ -29,5 +45,7 @@ The analysis demonstrated that predictive models can meaningfully support target
 - Scikit-learn
 - Jupyter Notebooks
 
+---
+
 ## Notes
-This repository contains a **portfolio-safe adaptation** of the original academic work. All data used here is synthetic or anonymised, and the focus is on methodology, decision framing, and evaluation logic.
+This repository contains a portfolio-safe adaptation of the original academic work. All data used here is synthetic or anonymised, and the focus is on methodology, decision framing, and evaluation logic rather than proprietary data.
